@@ -1,9 +1,9 @@
 public enum Cidade {
     BELO_HORIZONTE("Belo Horizonte", "13"),
     FORTALEZA("Fortaleza", "20"),
-    RECIFE("Recife", "35"),
+    RECIFE("Recife", "50"),
     JOAO_PESSOA("João Pessoa", "42"),
-    SAO_LUIS("São Luís", "50"),
+    SAO_LUIS("São Luís", "35"),
     NATAL("Natal", "61");
 
     private final String nome;
