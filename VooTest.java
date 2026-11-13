@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class VooTest {
 
@@ -13,33 +12,28 @@ public class VooTest {
 
     @BeforeEach
     void preparar() {
-        rota = mock(Rota.class, RETURNS_DEEP_STUBS);
-
-        voo = new Voo(
-                rota,
-                LocalDate.of(2026, 11, 15),
-                500.0
-        );
+        rota = new Rota(Cidade.BELO_HORIZONTE, Cidade.FORTALEZA);
+        voo = new Voo(rota, LocalDate.of(2026, 11, 15), 500.0);
     }
 
     @Test
     void deveCriarVooCorretamente() {
         assertEquals(rota, voo.getRota());
-        assertEquals(LocalDate.of(2026, 11, 15),
-                voo.getData());
+        assertEquals(LocalDate.of(2026, 11, 15), voo.getData());
         assertEquals(500.0, voo.getPrecoBase());
+        assertEquals("XAV1320", voo.getCodigo());
     }
 
     @Test
     void deveIniciarCom150Vagas() {
-        assertEquals(150, voo.vagasDisponiveis());
+        assertEquals(150, voo.vagasRestantes());
         assertTrue(voo.temVagas());
     }
 
     @Test
     void deveReservarVaga() {
         assertTrue(voo.reservarVaga());
-        assertEquals(149, voo.vagasDisponiveis());
+        assertEquals(149, voo.vagasRestantes());
     }
 
     @Test
@@ -50,83 +44,44 @@ public class VooTest {
 
         assertFalse(voo.temVagas());
         assertFalse(voo.reservarVaga());
-        assertEquals(0, voo.vagasDisponiveis());
+        assertEquals(0, voo.vagasRestantes());
     }
 
     @Test
-    void deveAceitarConexaoNoMesmoDia() {
-        Rota outraRota = mock(
-                Rota.class, RETURNS_DEEP_STUBS
-        );
-
-        when(outraRota.getOrigem())
-                .thenReturn(rota.getDestino());
-
-        Voo proximo = new Voo(
-                outraRota,
-                LocalDate.of(2026, 11, 15),
-                300.0
-        );
-
-        assertTrue(voo.podeSerSeguidoPor(proximo));
+    void deveRetornarOrigemCorreta() {
+        assertEquals(Cidade.BELO_HORIZONTE, voo.getOrigem());
     }
 
     @Test
-    void deveAceitarConexaoNoDiaSeguinte() {
-        Rota outraRota = mock(
-                Rota.class, RETURNS_DEEP_STUBS
-        );
-
-        when(outraRota.getOrigem())
-                .thenReturn(rota.getDestino());
-
-        Voo proximo = new Voo(
-                outraRota,
-                LocalDate.of(2026, 11, 16),
-                300.0
-        );
-
-        assertTrue(voo.podeSerSeguidoPor(proximo));
+    void deveRetornarDestinoCorreto() {
+        assertEquals(Cidade.FORTALEZA, voo.getDestino());
     }
 
     @Test
-    void naoDeveAceitarConexaoDepoisDeDoisDias() {
-        Voo proximo = new Voo(
-                rota,
-                LocalDate.of(2026, 11, 17),
-                300.0
-        );
-
-        assertFalse(voo.podeSerSeguidoPor(proximo));
+    void deveRetornarCodigoRota() {
+        assertEquals("1320", voo.getCodigoRota());
     }
 
     @Test
-    void naoDeveAceitarConexaoComOrigemDiferente() {
-        Rota outraRota = mock(
-                Rota.class, RETURNS_DEEP_STUBS
-        );
-
-        Voo proximo = new Voo(
-                outraRota,
-                LocalDate.of(2026, 11, 16),
-                300.0
-        );
-
-        assertFalse(voo.podeSerSeguidoPor(proximo));
+    void deveRetornarCapacidade() {
+        assertEquals(150, voo.getCapacidade());
     }
 
     @Test
-    void naoDeveAceitarConexaoNula() {
-        assertFalse(voo.podeSerSeguidoPor(null));
+    void deveIniciarComZeroPassageirosVendidos() {
+        assertEquals(0, voo.getPassageirosVendidos());
+    }
+
+    @Test
+    void deveIncrementarPassageirosVendidos() {
+        voo.reservarVaga();
+        voo.reservarVaga();
+        assertEquals(2, voo.getPassageirosVendidos());
     }
 
     @Test
     void deveCompararVoosIguais() {
-        Voo outro = new Voo(
-                rota,
-                LocalDate.of(2026, 11, 15),
-                700.0
-        );
+        Voo outro = new Voo(rota, LocalDate.of(2026, 11, 15), 700.0);
 
         assertEquals(voo, outro);
         assertEquals(voo.hashCode(), outro.hashCode());
@@ -134,11 +89,7 @@ public class VooTest {
 
     @Test
     void deveIdentificarVoosDiferentes() {
-        Voo outro = new Voo(
-                rota,
-                LocalDate.of(2026, 11, 16),
-                500.0
-        );
+        Voo outro = new Voo(rota, LocalDate.of(2026, 11, 16), 500.0);
 
         assertNotEquals(voo, outro);
     }
@@ -147,6 +98,7 @@ public class VooTest {
     void deveGerarTextoDoVoo() {
         String texto = voo.toString();
 
+        assertTrue(texto.contains("XAV1320"));
         assertTrue(texto.contains("2026-11-15"));
         assertTrue(texto.contains("500.0"));
         assertTrue(texto.contains("150"));

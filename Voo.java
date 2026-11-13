@@ -3,12 +3,12 @@ import java.util.Objects;
 
 public class Voo {
 
+    private static final int CAPACIDADE = 150;
+
     private Rota rota;
     private LocalDate data;
     private double precoBase;
     private int passageirosVendidos;
-
-    private static final int CAPACIDADE = 150;
 
     public Voo(Rota rota, LocalDate data, double precoBase) {
         this.rota = rota;
@@ -17,12 +17,24 @@ public class Voo {
         this.passageirosVendidos = 0;
     }
 
-    public String getCodigo() {
-        return "XAV" + rota.getCodigo();
-    }
-
     public Rota getRota() {
         return rota;
+    }
+
+    public Cidade getOrigem() {
+        return rota.getOrigem();
+    }
+
+    public Cidade getDestino() {
+        return rota.getDestino();
+    }
+
+    public String getCodigoRota() {
+        return rota.getCodigo();
+    }
+
+    public String getCodigo() {
+        return "XAV" + rota.getCodigo();
     }
 
     public LocalDate getData() {
@@ -33,12 +45,20 @@ public class Voo {
         return precoBase;
     }
 
-    public int vagasDisponiveis() {
-        return CAPACIDADE - passageirosVendidos;
+    public int getCapacidade() {
+        return CAPACIDADE;
+    }
+
+    public int getPassageirosVendidos() {
+        return passageirosVendidos;
     }
 
     public boolean temVagas() {
-        return vagasDisponiveis() > 0;
+        return vagasRestantes() > 0;
+    }
+
+    public int vagasRestantes() {
+        return CAPACIDADE - passageirosVendidos;
     }
 
     public boolean reservarVaga() {
@@ -49,34 +69,16 @@ public class Voo {
         return false;
     }
 
-    public boolean podeSerSeguidoPor(Voo proximo) {
-        if (proximo == null) {
-            return false;
-        }
-
-        boolean mesmaCidade = rota.getDestino()
-                .equals(proximo.getRota().getOrigem());
-
-        boolean dataValida = data.equals(proximo.getData())
-                || data.plusDays(1).equals(proximo.getData());
-
-        return mesmaCidade && dataValida;
-    }
-
     @Override
     public boolean equals(Object outro) {
         if (this == outro) {
             return true;
         }
-
         if (!(outro instanceof Voo)) {
             return false;
         }
-
         Voo voo = (Voo) outro;
-
-        return Objects.equals(rota, voo.rota)
-                && Objects.equals(data, voo.data);
+        return Objects.equals(rota, voo.rota) && Objects.equals(data, voo.data);
     }
 
     @Override
@@ -86,9 +88,9 @@ public class Voo {
 
     @Override
     public String toString() {
-        return "Voo: " + getCodigo()
-                + " | Data: " + data
-                + " | Preco: R$ " + precoBase
-                + " | Vagas: " + vagasDisponiveis();
+        return "Voo: " + getCodigo() 
+                + " | Data: " + data 
+                + " | Preco: R$ " + precoBase 
+                + " | Vagas restantes: " + vagasRestantes();
     }
 }

@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Cliente {
+
     private static int proximoRegistro = 1;
 
     private String nome;
@@ -10,10 +12,10 @@ public class Cliente {
     private List<Bilhete> historico;
 
     public Cliente(String nome, String sobrenome) {
-        if (nome == null) {
+        if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome não pode ser vazio.");
         }
-        if (sobrenome == null) {
+        if (sobrenome == null || sobrenome.trim().isEmpty()) {
             throw new IllegalArgumentException("Sobrenome não pode ser vazio.");
         }
         this.nome = nome;
@@ -50,5 +52,30 @@ public class Cliente {
             total += bilhete.calcularPrecoVenda();
         }
         return total;
+    }
+
+    @Override
+    public boolean equals(Object outro) {
+        if (this == outro) {
+            return true;
+        }
+        if (!(outro instanceof Cliente)) {
+            return false;
+        }
+        Cliente cliente = (Cliente) outro;
+        return numeroRegistro == cliente.numeroRegistro;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(numeroRegistro);
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente: " + nome + " " + sobrenome
+                + " | Registro: " + numeroRegistro
+                + " | Bilhetes: " + historico.size()
+                + " | Total gasto: R$ " + calcularTotalGasto();
     }
 }
